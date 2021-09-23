@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Ad">
+    <insert id="insertAd" parameterType="Ad">
+        INSERT INTO ADVERTISING(adid, ad_name, ad_status, ad_type, bid_modifier) VALUE (#{ad_id}, #{ad_name}, #{ad_status}, #{ad_type}, #{bid_modifier});
+    </insert>
+</mapper>
+<!--<selectKey keyProperty = "ad_id" resultType = "int" order = "AFTER">-->
+<!--select last_insert_id() as id-->
+<!--</selectKey>-->

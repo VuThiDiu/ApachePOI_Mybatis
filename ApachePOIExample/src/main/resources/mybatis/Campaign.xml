@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Campaign">
+    <insert id="insertCampaign" parameterType="Campaign">
+        INSERT INTO  CAMPAIGN(campaignid, campaign_name, campaign_status, start_date, end_date, budget) VALUE (#{campaign_id}, #{campaign_name}, #{campaign_status}, #{start_date}, #{end_date}, #{budget});
+    </insert>
+</mapper>
+<!--<selectKey keyProperty = "campaign_id" resultType = "int" order = "AFTER">-->
+<!--select last_insert_id() as id-->
+<!--</selectKey>-->
