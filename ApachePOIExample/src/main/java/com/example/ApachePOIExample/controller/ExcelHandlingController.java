@@ -23,21 +23,25 @@ public class ExcelHandlingController {
     @PostMapping(value = "/less-than-5MB", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<String> handleFileExcel(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String fileName) throws IOException {
         excelHandlingService = new ExcelHandlingService();
-        boolean isError =  excelHandlingService.handleFileHasSizeLessThan5MB(file, fileName);
-        if(!isError){
+        int isError =  excelHandlingService.handleFileHasSizeLessThan5MB(file, fileName);
+        if(isError == 0){
             return new ResponseEntity<String>("Success" , HttpStatus.OK);
-        }else{
+        }else if (isError == 1){
             return new ResponseEntity<String>(excelHandlingService.getInputFile().getName(),  HttpStatus.EXPECTATION_FAILED);
+        }else {
+            return new ResponseEntity<String>("Không đúng định dạng file đầu vào", HttpStatus.BAD_REQUEST);
         }
         }
     @PostMapping("/more-than-5MB")
     public ResponseEntity<String> handleFileExcelHasSizeMoreThan5MB( @RequestParam("file") MultipartFile file , @RequestParam("fileName") String fileName) throws FileNotFoundException {
         excelHandlingService = new ExcelHandlingService();
-        boolean isError = excelHandlingService.handleFileHasSizeMoreThan5MB(file, fileName);
-        if(!isError){
+        int isError =  excelHandlingService.handleFileHasSizeLessThan5MB(file, fileName);
+        if(isError == 0){
             return new ResponseEntity<String>("Success" , HttpStatus.OK);
-        }else{
+        }else if (isError == 1){
             return new ResponseEntity<String>(excelHandlingService.getInputFile().getName(),  HttpStatus.EXPECTATION_FAILED);
+        }else {
+            return new ResponseEntity<String>("Không đúng định dạng file đầu vào", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -51,5 +55,5 @@ public class ExcelHandlingController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
                 .body(resource);
     }
-    // something else
+
 }

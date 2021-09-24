@@ -40,7 +40,7 @@ public class HandleExcel<T> {
     }
 
 
-    public void handleData(Class<T> cls){
+    public int handleData(Class<T> cls){
         for (Row  row : sheet){
             int currentCell = 1;
             try {
@@ -77,16 +77,21 @@ public class HandleExcel<T> {
                 if(this.isError() == false) {
                     activateList.add((T) obj);
                 }
-
-
             } catch (InstantiationException e) {
+
                 e.printStackTrace();
+                return 0;
             } catch (IllegalAccessException e) {
+
                 e.printStackTrace();
+                return 0;
             } catch (NoSuchFieldException e) {
+
                 e.printStackTrace();
+                return 0;
             }
         }
+        return 1;
     }
     public String readAndValidateDataForCampaign(Object obj,  Field field, Cell cell,  Row row){
         field.setAccessible(true);

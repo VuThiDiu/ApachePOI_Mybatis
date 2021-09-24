@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 @Service
 public class ExcelHandlingService {
     private Workbook workbookError;
-    private boolean isError = false;
+    private int isError = 0;
     private Sheet errorSheet;
     private File inputFile;
     private String PATH_FILE = "src/main/resources/excelFiles/";
-    public boolean handleFileHasSizeLessThan5MB(MultipartFile file, String fileName){
+    public int handleFileHasSizeLessThan5MB(MultipartFile file, String fileName){
         try {
             FileInputStream fileInputStream = (FileInputStream) file.getInputStream();
             Workbook workbook = new XSSFWorkbook(fileInputStream);
@@ -42,14 +42,22 @@ public class ExcelHandlingService {
             listSheet.put("ErrorMessage", ErrorMessage.class);
             for(int i = 0 ; i < workbook.getNumberOfSheets(); i++){
                 Sheet sheet = workbook.getSheetAt(i);
+                if(!sheet.getSheetName().equals("Campaign") && !sheet.getSheetName().equals("Ad")){
+                    setError(2);
+                    return 2;
+                }
                 Class cls =listSheet.get(sheet.getSheetName());
                 HandleExcel handleExcel = new HandleExcel(sheet);
-                handleExcel.handleData(cls);
+                int ex = handleExcel.handleData(cls);
+                if(ex == 0){
+                    setError(2);
+                    return 2;
+                }
                 if (!handleExcel.getActivateList().isEmpty()){
                     insertToDb(handleExcel.getActivateList(), cls);
                 }else {
-                    if(isError == false){
-                        setError(true);
+                    if(isError == 0){
+                        setError(1);
                         workbookError = new XSSFWorkbook();
                     }
                     errorSheet = workbookError.createSheet(sheet.getSheetName());
@@ -60,7 +68,7 @@ public class ExcelHandlingService {
 
                 }
             }
-            if(this.isError == true){
+            if(this.isError == 1){
                 inputFile = new File(PATH_FILE + fileName +" error.xlsx");
                 inputFile.getParentFile().mkdirs();
                 FileOutputStream outputStream = new FileOutputStream(inputFile);
@@ -68,7 +76,9 @@ public class ExcelHandlingService {
             }
 
         } catch (IOException e) {
+            setError(2);
             e.printStackTrace();
+            return 2;
         }
         return this.isError;
     }
@@ -140,7 +150,7 @@ public class ExcelHandlingService {
         }
         return errorMessageList;
     }
-    public boolean handleFileHasSizeMoreThan5MB(MultipartFile file, String fileName){
+    public int handleFileHasSizeMoreThan5MB(MultipartFile file, String fileName){
         try {
             FileInputStream inputStream = (FileInputStream) file.getInputStream();
             Workbook workbook = StreamingReader.builder()
@@ -158,19 +168,22 @@ public class ExcelHandlingService {
                 if (!handleExcel.getActivateList().isEmpty()){
                     insertToDb(handleExcel.getActivateList(), cls);
                 }else {
-                    setError(true);
+                    if(isError == 0){
+                        setError(1);
+                        workbookError = new XSSFWorkbook();
+                    }
+                    errorSheet = workbookError.createSheet(sheet.getSheetName());
                     Class clss = listSheet.get("ErrorMessage");
-                    insertToDb(handleExcel.getErrorMessageList(), clss);
+                    int lastId = insertToDb(handleExcel.getErrorMessageList(), clss);
+                    List<ErrorMessage> errorMessageList = readDataFromDB(lastId);
+                    writeToFileExcel(errorSheet, errorMessageList);
+
                 }
             }
-            if(this.isError == true){
+            if(this.isError == 1){
                 inputFile = new File(PATH_FILE + fileName +" error.xlsx");
                 inputFile.getParentFile().mkdirs();
                 FileOutputStream outputStream = new FileOutputStream(inputFile);
-                workbookError = new XSSFWorkbook();
-                errorSheet = workbookError.createSheet("Error");
-                List<ErrorMessage> errorMessageList = readDataFromDB(0);
-                writeToFileExcel(errorSheet, errorMessageList);
                 workbookError.write(outputStream);
             }
 
@@ -180,12 +193,12 @@ public class ExcelHandlingService {
         return this.isError;
             }
 
-    public boolean isError() {
+    public int getIsError() {
         return isError;
     }
 
-    public void setError(boolean error) {
-        isError = error;
+    public void setError(int isError) {
+        this.isError = isError;
     }
 
     public File getInputFile() {
