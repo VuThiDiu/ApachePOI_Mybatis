@@ -35,7 +35,7 @@ public class ExcelHandlingController {
     @PostMapping("/more-than-5MB")
     public ResponseEntity<String> handleFileExcelHasSizeMoreThan5MB( @RequestParam("file") MultipartFile file , @RequestParam("fileName") String fileName) throws FileNotFoundException {
         excelHandlingService = new ExcelHandlingService();
-        int isError =  excelHandlingService.handleFileHasSizeLessThan5MB(file, fileName);
+        int isError =  excelHandlingService.handleFileHasSizeMoreThan5MB(file, fileName);
         if(isError == 0){
             return new ResponseEntity<String>("Success" , HttpStatus.OK);
         }else if (isError == 1){
@@ -55,5 +55,4 @@ public class ExcelHandlingController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
                 .body(resource);
     }
-
 }

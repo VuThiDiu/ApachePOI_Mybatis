@@ -3,7 +3,10 @@
 
 <mapper namespace="Ad">
     <insert id="insertAd" parameterType="Ad">
-        INSERT INTO ADVERTISING(adid, ad_name, ad_status, ad_type, bid_modifier) VALUE (#{ad_id}, #{ad_name}, #{ad_status}, #{ad_type}, #{bid_modifier});
+        INSERT INTO ADVERTISING(adid, ad_name, ad_status, ad_type, bid_modifier) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.ad_id}, #{item.ad_name}, #{item.ad_status}, #{item.ad_type}, #{item.bid_modifier})
+        </foreach>
     </insert>
 </mapper>
 <!--<selectKey keyProperty = "ad_id" resultType = "int" order = "AFTER">-->

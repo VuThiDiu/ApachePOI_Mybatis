@@ -3,7 +3,10 @@
 
 <mapper namespace="Campaign">
     <insert id="insertCampaign" parameterType="Campaign">
-        INSERT INTO  CAMPAIGN(campaignid, campaign_name, campaign_status, start_date, end_date, budget) VALUE (#{campaign_id}, #{campaign_name}, #{campaign_status}, #{start_date}, #{end_date}, #{budget});
+        INSERT INTO  CAMPAIGN(campaignid, campaign_name, campaign_status, start_date, end_date, budget) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.campaign_id}, #{item.campaign_name}, #{item.campaign_status}, #{item.start_date}, #{item.end_date}, #{item.budget})
+        </foreach>
     </insert>
 </mapper>
 <!--<selectKey keyProperty = "campaign_id" resultType = "int" order = "AFTER">-->

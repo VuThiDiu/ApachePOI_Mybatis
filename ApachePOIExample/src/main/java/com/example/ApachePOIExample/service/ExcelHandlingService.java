@@ -65,7 +65,6 @@ public class ExcelHandlingService {
                     int lastId = insertToDb(handleExcel.getErrorMessageList(), clss);
                     List<ErrorMessage> errorMessageList = readDataFromDB(lastId);
                     writeToFileExcel(errorSheet, errorMessageList);
-
                 }
             }
             if(this.isError == 1){
@@ -83,7 +82,6 @@ public class ExcelHandlingService {
         return this.isError;
     }
     public void writeToFileExcel(Sheet sheetName, List<ErrorMessage> listErrorMesssage){
-        // dong khoi dau nay
         Row row ;
         Cell cell;
         row = sheetName.createRow(0);
@@ -125,11 +123,22 @@ public class ExcelHandlingService {
                 if (session.selectOne("ErrorMessage.selectMaxId")!=null){
                     lastId = session.selectOne("ErrorMessage.selectMaxId");
                 }
+            int  chunk = 5000;
+                    if(arr.size() < 5000){
+                        session.insert(cls.getSimpleName()+".insert"+cls.getSimpleName(),  arr);
+                        session.commit();
+                    }else{
+                        for (int i = 0 ,  j = arr.size(); i < j; i+= chunk){
+                        List temporary = arr.subList(i, i+chunk);
+                        session.insert(cls.getSimpleName()+ ".insert"+cls.getSimpleName(), temporary);
+                        session.commit();
+                    }
 
-            arr.forEach((element) -> {
-                session.insert(cls.getSimpleName()+".insert"+cls.getSimpleName(), element);
-                session.commit();
-            });
+                }
+//            arr.forEach((element) -> {
+//                session.insert(cls.getSimpleName()+".insert"+cls.getSimpleName(), element);
+//                session.commit();
+//            });
             session.close();
         } catch (IOException e) {
             e.printStackTrace();

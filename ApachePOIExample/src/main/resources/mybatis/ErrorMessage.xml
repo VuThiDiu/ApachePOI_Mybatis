@@ -3,10 +3,10 @@
 
 <mapper namespace="ErrorMessage">
     <insert id="insertErrorMessage" parameterType="ErrorMessage">
-        INSERT INTO ERRORMESSAGE (sheet_name,header_name, row_number, error_message) VALUE ( #{sheet_name},#{header_name}, #{row_number}, #{error_message});
-        <selectKey keyProperty = "id" resultType = "int" order = "AFTER">
-            select last_insert_id() as id
-        </selectKey>
+        INSERT INTO ERRORMESSAGE (sheet_name,header_name, row_number, error_message) VALUES
+        <foreach collection="list" item="item" separator=",">
+            ( #{item.sheet_name},#{item.header_name}, #{item.row_number}, #{item.error_message})
+        </foreach>
     </insert>
     <select id="selectErrorMessage" parameterType="int" resultType="ErrorMessage" resultMap="result">
         SELECT * FROM ERRORMESSAGE  where id > #{number}
